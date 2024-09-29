@@ -34,6 +34,23 @@ $ cd cmake-build
 
 $ cmake ..
 
+### <<<<<<<<<<<<<<<<<<< notices by arbor 
+
+The project has several internal win32 dependencies. 
+
+On Linux, add these in the CMakeList.txt
+
+set (CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-m32")
+set (CMAKE_C_FLAGS ${CMAKE_C_FLAGS} "-m32")
+
+On Windows, 
+
+$ cmake -A Win32 ..
+
+or Choose Win32 as the platform for generator if cmake GUI is used.
+
+>>>>>>>>>>>>>>>>>>>>>
+
 Alternatively, if you want to specifiy compile-time options:
 (See also [2] SETUP further down)
 
