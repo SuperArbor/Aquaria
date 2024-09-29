@@ -29,10 +29,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 	#undef min
 	#undef max
 
-    #ifdef _MSC_VER
-        #define strtof (float)strtod
-        #define snprintf _snprintf
-    #endif
+	#if _MSC_VER < 1700
+		#define strtof (float)strtod
+		#define snprintf _snprintf
+	#endif
 #endif
 
 #include "BBGECompileConfig.h"
@@ -90,7 +90,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 
 #ifdef BBGE_BUILD_SDL
-
+	#ifndef SDL_MAIN_HANDLED
+		#define SDL_MAIN_HANDLED
+	#endif
 	#include "SDL.h"
 
 #endif

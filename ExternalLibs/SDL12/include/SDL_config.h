@@ -30,7 +30,7 @@
 #include <stdarg.h>
 
 #ifdef _MSC_VER
-typedef __int8 int8_t;
+typedef signed __int8 int8_t;
 typedef unsigned __int8 uint8_t;
 typedef __int16 int16_t;
 typedef unsigned __int16 uint16_t;

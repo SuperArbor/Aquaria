@@ -1,6 +1,8 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 PROJECT(Aquaria)
 
+ADD_DEFINITIONS(-Dmain=SDL_main)
+
 INCLUDE(CheckCCompilerFlag)
 INCLUDE(CheckFunctionExists)
 
@@ -30,7 +32,8 @@ ENDIF(NOT CMAKE_BUILD_TYPE)
 OPTION(AQUARIA_DEMO_BUILD "Demo Build?" FALSE)
 OPTION(AQUARIA_USE_VFS "Use Virtual File System? Required for some additional features." TRUE)
 
-OPTION(AQUARIA_USE_SDL2 "Use SDL2" FALSE)
+# for function SDL_GetWindowWMInfo in core.cpp
+OPTION(AQUARIA_USE_SDL2 "Use SDL2" TRUE)
 OPTION(AQUARIA_USE_GLM "Use GLM for matrix math" TRUE)
 
 # No Steamworks SDK for Linux at the moment. Roll our own achievements.
@@ -201,6 +204,7 @@ if(NOT SDL_FOUND)
             set(SDL_LIBRARY "${SDLDIR}/lib/win32/SDL.lib" CACHE FILEPATH "Where the SDL library can be found" FORCE)
         endif(AQUARIA_USE_SDL2)
         set(SDL_LIBRARY ${SDLMAIN_LIBRARY} ${SDL_LIBRARY}) # not seen by user
+        set(SDL_LIBRARY_DIR "${SDLDIR}/lib/win32")
     else(MACOSX)
         message(SEND_ERROR "We don't have a prebuilt SDL for this platform.")
     endif(MACOSX)
@@ -680,6 +684,8 @@ IF(MSVC)
         ${FREETYPE2_SRCS}
         PROPERTIES COMPILE_FLAGS "-DFT_CONFIG_OPTION_SYSTEM_ZLIB -DFT2_BUILD_LIBRARY -I${FREETYPE2SRCDIR} -I${FREETYPE2DIR}/include/freetype/config -DHAVE_FCNTL_H"
     )
+    # For _MSC_VER >= 1700
+    ADD_DEFINITIONS(-D_XKEYCHECK_H)
 ELSE(MSVC)
     # FT2 seems to not be strict-aliasing safe, so disable that in GCC.
     CHECK_C_COMPILER_FLAG("-fno-strict-aliasing" COMPILER_HAS_NOSTRICTALIAS)
@@ -788,13 +794,13 @@ ENDIF(OGGVORBIS_FOUND)
 IF(TINYXML2_FOUND)
     SET(OPTIONAL_LIBS ${OPTIONAL_LIBS} ${TINYXML2_LIBRARIES})
 ELSE(TINYXML2_FOUND)
-   SET(OPTIONAL_SRCS ${OPTIONAL_SRCS} ${TINYXML2_SRCS})
+    SET(OPTIONAL_SRCS ${OPTIONAL_SRCS} ${TINYXML2_SRCS})
 ENDIF(TINYXML2_FOUND)
 
 IF(FTGL_FOUND)
     SET(OPTIONAL_LIBS ${OPTIONAL_LIBS} ${FTGL_LIBRARIES})
 ELSE(FTGL_FOUND)
-   SET(OPTIONAL_SRCS ${OPTIONAL_SRCS} ${FTGL_SRCS})
+    SET(OPTIONAL_SRCS ${OPTIONAL_SRCS} ${FTGL_SRCS})
 ENDIF(FTGL_FOUND)
 
 ADD_EXECUTABLE(aquaria ${EXETYPE}
@@ -802,7 +808,8 @@ ADD_EXECUTABLE(aquaria ${EXETYPE}
     ${BBGE_SRCS}
     ${OPTIONAL_SRCS}
 )
-TARGET_LINK_LIBRARIES(aquaria ${OPTIONAL_LIBS})
+LINK_DIRECTORIES(${SDL_LIBRARY_DIR})
+TARGET_LINK_LIBRARIES(aquaria ${OPTIONAL_LIBS} opengl32)
 
 # end of CMakeLists.txt ...
 
